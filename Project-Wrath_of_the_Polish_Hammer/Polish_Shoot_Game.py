@@ -2,7 +2,7 @@ import pygame
 import sys
 
 
-def Main():
+def main():
     pygame.init()
     pygame.display.set_caption("The Polish Hammer")
     screen = pygame.display.set_mode((1000, 700))
@@ -19,4 +19,4 @@ def Main():
         pygame.display.update()
 
 
-Main()
+main()
