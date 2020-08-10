@@ -2,8 +2,8 @@ import pygame
 import sys
 
 pygame.init()
-pygame.display.set_caption("Hello World")
-screen = pygame.display.set_mode((640, 480))
+pygame.display.set_caption("The Polish Hammer")
+screen = pygame.display.set_mode((1000, 700))
 
 while True:
     for event in pygame.event.get():
