@@ -256,7 +256,7 @@ def main():
     # Draw things on the screen
 
         pygame.display.update()
-
+# main()
 def start():
     pygame.init()
     pygame.display.set_caption("Let's Save the World!")
