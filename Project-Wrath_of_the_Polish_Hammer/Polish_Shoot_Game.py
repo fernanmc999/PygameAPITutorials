@@ -173,7 +173,7 @@ def main():
     game_over_image=pygame.image.load("Polish_Hammered.jpeg")
     victory_sound=pygame.mixer.Sound("battle explosion.wav")
     victory_image=pygame.image.load("Victory Page.jpeg")
-    #game_over_sound=pygame.mixer.Sound("aaa.wav")
+    game_over_sound=pygame.mixer.Sound("aaa.wav")
 
     while True:
         clock.tick(60)
@@ -230,7 +230,7 @@ def main():
             victory_sound.play()
             image1 = pygame.transform.scale(victory_image, (1000, 650))
             screen.blit(image1, (0, 0))
-            # game_over_sound.play()
+            game_over_sound.play()
             pygame.display.update()
             continue
 
