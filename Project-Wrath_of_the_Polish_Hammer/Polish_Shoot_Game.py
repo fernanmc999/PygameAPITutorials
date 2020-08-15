@@ -144,7 +144,7 @@ class Mothership:
         pass
 
     def move(self):
-        self.x += self.speed
+        self.x = self.x+self.speed
         if abs(self.x-self.original_x) > 400:
             self.speed = -self.speed
 
@@ -172,7 +172,7 @@ def main():
     is_game_over=False
     game_over_image=pygame.image.load("Polish_Hammered.jpeg")
     victory_sound=pygame.mixer.Sound("battle explosion.wav")
-    victory_image=pygame.image.load("Victory Page.jpeg")
+    victory_image=pygame.image.load("Super Victory.jpeg")
     game_over_sound=pygame.mixer.Sound("aaa.wav")
 
     while True:
@@ -230,8 +230,9 @@ def main():
             victory_sound.play()
             image1 = pygame.transform.scale(victory_image, (1000, 650))
             screen.blit(image1, (0, 0))
-            game_over_sound.play()
             pygame.display.update()
+            if event.type == pygame.KEYDOWN and pressed_keys[pygame.K_e]:
+                main()
             continue
 
 
@@ -256,4 +257,23 @@ def main():
 
         pygame.display.update()
 
-main()
+def start():
+    pygame.init()
+    pygame.display.set_caption("Let's Save the World!")
+    screen = pygame.display.set_mode((1000, 650))
+    while True:
+        for event in pygame.event.get():
+            pressed_keys = pygame.key.get_pressed()
+            print(event)  # Used for an example here
+            if event.type == pygame.QUIT:
+                sys.exit()
+            if event.type == pygame.KEYDOWN and pressed_keys[pygame.K_e]:
+                main()
+                pass
+            # Additional interactions
+
+        # Draw things on the screen
+        screen.fill((0, 0, 0))
+        pygame.display.update()
+
+start()
