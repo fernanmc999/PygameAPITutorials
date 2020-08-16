@@ -29,11 +29,16 @@ class Fighter:
         self.image.set_colorkey((255,255,255))
         self.missiles=[]
         self.fire_sound=pygame.mixer.Sound("pew.wav")
+        self.health=5
+        self.died=False
         pass
 
     def draw(self):
         # Draw this Fighter, using its image at its current (x, y) position.
         self.screen.blit(self.image, (self.x,self.y))
+        # API --> pygame.draw.rect(screen, (r,g,b), (x, y, width, height), thickness)
+        pygame.draw.rect(self.screen, (255, 0, 0), (10, 600, 100, 30))
+        pygame.draw.rect(self.screen, (124, 252, 0), (10, 600, 100 - (20 * (5 - self.health)), 30))
         pass
 
     def fire(self):
@@ -49,6 +54,11 @@ class Fighter:
         for k in range(len(self.missiles) - 1, -1, -1):
             if self.missiles[k].has_exploded or self.missiles[k].y < 0:
                 del self.missiles[k]
+
+    def wound(self, lasers):
+        hitbox = pygame.Rect(self.x, self.y, self.image.get_width(), self.image.get_height())
+        return hitbox.collidepoint(lasers.x, lasers.y)
+
 
 class Badguy:
     def __init__(self, screen, x, y, speed):
@@ -132,6 +142,9 @@ class Mothership:
         self.speed=8
         self.health=100
         self.death=False
+        self.lasers=[]
+        self.automation=0
+        self.fire_sound=pygame.mixer.Sound("pew.wav")
         pass
 
     def draw(self):
@@ -154,6 +167,44 @@ class Mothership:
         hitbox=pygame.Rect(self.x,self.y,self.image.get_width(),self.image.get_height())
         return hitbox.collidepoint(missile.x,missile.y)
 
+    def charge(self):
+        # Construct a new Missile 50 pixels to the right of this Fighter.
+        # Append that Missile to this Fighter's list of Missile objects.
+        image1 = pygame.transform.scale(self.image, (500, 150))
+        new_Laser=Laser(self.screen, self.x+image1.get_width()//2,
+                            image1.get_height()+1)
+        self.lasers.append(new_Laser)
+        self.fire_sound.play()
+
+    def remove_exploded_laser(self):
+        # Already complete
+        for k in range(len(self.lasers) - 1, -1, -1):
+            if self.lasers[k].has_exploded or self.lasers[k].y > 650:
+                del self.lasers[k]
+
+    def automated_laser(self):
+        self.automation+=1
+        if self.automation==30:
+            self.charge()
+            self.automation=0
+
+class Laser:
+    def __init__(self, screen, x, y):
+        # Store the data.  Initialize:   y to 591   and   has_exploded to False.
+        self.screen=screen
+        self.x=x
+        self.y=y
+        self.has_exploded=False
+
+    def move(self):
+        # Make self.y 5 smaller than it was (which will cause the Missile to move UP).
+        self.y+=10
+        pass
+
+    def draw(self):
+        # Draw a vertical, 10 pixels thick, 20 pixels long, red (or green) line on the screen,
+        # where the line starts at the current position of this Missile.
+        pygame.draw.line(self.screen, (124,252,0), (self.x,self.y), (self.x, self.y+100), 30)
 
 def main():
     pygame.init()
@@ -168,12 +219,12 @@ def main():
     scoreboard = Scoreboard(screen)
     Not_Yet = pygame.mixer.Sound("lose.wav")
     ship_hit=pygame.mixer.Sound("damage.wav")
-    #Fool=pygame.mixer.Sound("You_Fool.wav")   #Unable to use
+    fighter_hit=pygame.mixer.Sound("expl06.wav")
     is_game_over=False
     game_over_image=pygame.image.load("Polish_Hammered.jpeg")
     victory_sound=pygame.mixer.Sound("battle explosion.wav")
     victory_image=pygame.image.load("Super Victory.jpeg")
-    game_over_sound=pygame.mixer.Sound("aaa.wav")
+    heat_death=pygame.mixer.Sound("aaa.wav")
 
     while True:
         clock.tick(60)
@@ -191,8 +242,9 @@ def main():
         if is_game_over:
             image1 = pygame.transform.scale(game_over_image, (1000, 650))
             screen.blit(image1, (0,0))
-            #game_over_sound.play()
             pygame.display.update()
+            if event.type == pygame.KEYDOWN and pressed_keys[pygame.K_e]:
+                main()
             continue
 
         pressed_keys=pygame.key.get_pressed()
@@ -207,6 +259,10 @@ def main():
 
         enemy_fleet.move()
         ship.move()
+        ship.automated_laser()
+        for laser in ship.lasers:
+            laser.move()
+            laser.draw()
         for missile in fighter.missiles:
             missile.move()
             missile.draw()
@@ -234,14 +290,29 @@ def main():
             if event.type == pygame.KEYDOWN and pressed_keys[pygame.K_e]:
                 main()
             continue
-
-
+        for laser in ship.lasers:
+            if fighter.wound(laser):
+                if fighter.health>0:
+                    scoreboard.score-=100
+                    fighter.health-=1
+                    fighter_hit.play()
+                    laser.has_exploded=True
+                else:
+                    heat_death.play()
+                    fighter.died=True
+                    laser.has_exploded=True
+        if fighter.died==True:
+            image1 = pygame.transform.scale(game_over_image, (1000, 650))
+            screen.blit(image1, (0, 0))
+            pygame.display.update()
+            if event.type == pygame.KEYDOWN and pressed_keys[pygame.K_e]:
+                main()
+            continue
         fighter.remove_exploded_missiles()
         enemy_fleet.remove_dead_badguys()
-
+        ship.remove_exploded_laser()
         if enemy_fleet.is_defeated:
             Not_Yet.play()
-            #Fool.play()
             enemy_rows+=1
             enemy_fleet=EnemyFleet(screen,enemy_rows)
 
