@@ -212,7 +212,7 @@ def main():
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((1000, 650))
 
-    enemy_rows=6
+    enemy_rows=3
     enemy_fleet= EnemyFleet(screen,enemy_rows)
     fighter = Fighter(screen, 400, screen.get_height() - 60)
     ship=Mothership(screen,200,20)
