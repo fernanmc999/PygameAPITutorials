@@ -184,7 +184,7 @@ class Mothership:
 
     def automated_laser(self):
         self.automation+=1
-        if self.automation==30:
+        if self.automation==60:
             self.charge()
             self.automation=0
 
@@ -298,10 +298,10 @@ def main():
                     fighter_hit.play()
                     laser.has_exploded=True
                 else:
-                    heat_death.play()
                     fighter.died=True
                     laser.has_exploded=True
         if fighter.died==True:
+            heat_death.play()
             image1 = pygame.transform.scale(game_over_image, (1000, 650))
             screen.blit(image1, (0, 0))
             pygame.display.update()
@@ -319,19 +319,13 @@ def main():
         for badguy in enemy_fleet.badguys:
             if badguy.y>screen.get_height()-fighter.image.get_height()-badguy.image.get_height():
                 is_game_over=True
-
-
-
-    # Additional interactions
-
-    # Draw things on the screen
-
         pygame.display.update()
 # main()
 def start():
     pygame.init()
     pygame.display.set_caption("Let's Save the World!")
     screen = pygame.display.set_mode((1000, 650))
+    Beginning_Image=pygame.image.load("Beginning.jpeg")
     while True:
         for event in pygame.event.get():
             pressed_keys = pygame.key.get_pressed()
@@ -344,7 +338,9 @@ def start():
             # Additional interactions
 
         # Draw things on the screen
-        screen.fill((0, 0, 0))
+        screen.fill((0,0,0))
+        initiation = pygame.transform.scale(Beginning_Image, (1000, 650))
+        screen.blit(initiation, (0, 0))
         pygame.display.update()
 
 start()
